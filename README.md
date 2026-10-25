@@ -123,12 +123,6 @@ All 55 examples/templates pass (PlantUML 1.2024.7, Mermaid CLI 11).
   if you want a versioned download.
 
 ### Changelog
-- **2026-10-25** — Added `CONTRIBUTORS.md`, linked from the Contributing section.
-- **2026-10-25** — Added a "Built with Claude. Available for any AI agent." tagline under the title.
-- **2026-10-25** — Reworded the intro so it doesn't read as Claude-exclusive: it's packaged as a Claude skill,
-  but `SKILL.md` is plain-text instructions any AI agent can follow.
-- **2026-10-25** — Removed all references to the `source/` folder (the reference PDF); it's no longer part of
-  the published project. `docs/README.md` now mirrors this file instead of holding a separate banner note.
 - **2026-10-25** — Initial version: SKILL.md, references, templates, validate.py; all examples render-tested.
 
 ## Contributing
