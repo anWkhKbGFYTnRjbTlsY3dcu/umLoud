@@ -123,6 +123,7 @@ All 55 examples/templates pass (PlantUML 1.2024.7, Mermaid CLI 11).
   if you want a versioned download.
 
 ### Changelog
+- **2026-10-25** — Added `CONTRIBUTORS.md`, linked from the Contributing section.
 - **2026-10-25** — Added a "Built with Claude. Available for any AI agent." tagline under the title.
 - **2026-10-25** — Reworded the intro so it doesn't read as Claude-exclusive: it's packaged as a Claude skill,
   but `SKILL.md` is plain-text instructions any AI agent can follow.
@@ -132,7 +133,7 @@ All 55 examples/templates pass (PlantUML 1.2024.7, Mermaid CLI 11).
 
 ## Contributing
 
-Issues and PRs welcome.
+Issues and PRs welcome — see [`CONTRIBUTORS.md`](CONTRIBUTORS.md) for who's already helped out.
 
 - **Bug / incorrect notation?** Open an issue with the request you gave it and what came back.
 - **Adding or editing a diagram type or syntax rule?** Rules live in `skill/umloud/references/` (format-neutral),
@@ -146,4 +147,4 @@ Issues and PRs welcome.
 
 ## License
 
-MIT — see [`LICENSE`](LICENSE). Use it, fork it, modify it, ship it.
+MIT — see [`LICENSE`](../LICENSE). Use it, fork it, modify it, ship it.

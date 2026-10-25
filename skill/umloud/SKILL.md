@@ -1,6 +1,6 @@
 ---
 name: umloud
-description: Create clear, correct, standards-compliant UML 2.5.1 diagrams (class, sequence, use case, activity, state machine, component, deployment, package, object, communication, timing, profile) as PlantUML and/or Mermaid. Use whenever the user asks for a UML diagram, to model or document a system, to visualise code structure or a flow, or to review/fix an existing UML diagram.
+description: Use whenever the user wants a UML diagram, needs to model or document a system, wants to visualise code structure or a flow, or wants an existing UML diagram reviewed or fixed. Produces correct UML 2.5.1 diagrams — class, sequence, use case, activity, state machine, component, deployment, package, object, communication, timing, profile — in PlantUML and/or Mermaid.
 ---
 
 # umLoud — UML diagrams done right
