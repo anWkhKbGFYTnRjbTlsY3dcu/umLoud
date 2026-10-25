@@ -1,0 +1,22 @@
+sequenceDiagram
+  %% umLoud template — one scenario
+  participant Caller as caller
+  participant A as a : ClassA
+  participant B as b : ClassB
+  participant C as c : ClassC
+  Caller->>+A: start(args)
+  A->>+B: request(x)
+  loop for each item
+    B->>+C: process(item)
+    C-->>-B: result
+  end
+  alt condition
+    B-->>A: ok
+  else otherwise
+    B-->>A: error
+  end
+  deactivate B
+  opt optional step
+    A-)C: notify()
+  end
+  A-->>-Caller: result

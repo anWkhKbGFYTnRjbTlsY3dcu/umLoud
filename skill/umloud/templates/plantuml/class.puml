@@ -1,0 +1,33 @@
+@startuml
+' umLoud template — class diagram. Replace names; delete what you don't need.
+title <Subject> — <conceptual|software> perspective (<sketch|blueprint>)
+hide empty members
+hide circle
+skinparam classAttributeIconSize 0
+
+abstract class Supertype {
+  name : String [1]
+  {abstract} + operation() : Result {query}
+}
+class Subtype {
+  attribute : Type [0..1]
+  + command(param : Type)
+}
+class Whole
+class Part
+class Other
+interface Contract <<interface>> {
+  + call()
+}
+enum Kind <<enumeration>> {
+  A
+  B
+}
+
+Supertype <|-- Subtype
+Whole "1" *-- "*\nparts {ordered}" Part
+Subtype "*" --> "1\nother" Other
+Contract <|.. Other
+Subtype ..> Kind
+note right of Subtype : {constraint in natural language}
+@enduml

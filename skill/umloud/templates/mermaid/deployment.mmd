@@ -1,0 +1,13 @@
+flowchart TB
+  %% umLoud template — deployment (Mermaid approximation)
+  subgraph A["«device» Device A {instances = 2}"]
+    subgraph rt["«executionEnvironment» Runtime"]
+      jar["«artifact» app.jar"]
+    end
+  end
+  subgraph B["«device» Device B"]
+    subgraph db["«executionEnvironment» DBMS"]
+      schema["«artifact» schema"]
+    end
+  end
+  A ---|protocol| B

@@ -1,0 +1,14 @@
+stateDiagram-v2
+  %% umLoud template — state machine for ONE class
+  [*] --> Composite
+  state Composite {
+    [*] --> StateA
+    state "StateB" as StateB
+    StateB : entry / onEnter
+    StateB : do / ongoingWork
+    StateB : exit / onExit
+    StateA --> StateB : event [guard] / activity
+    StateB --> StateA : otherEvent
+  }
+  Composite --> Done : cancel / cleanup
+  Done --> [*]

@@ -1,0 +1,16 @@
+@startuml
+' umLoud template — deployment diagram (one environment)
+title <Environment> deployment
+node "Device A" <<device>> as A {
+  node "Runtime" <<executionEnvironment>> {
+    artifact "app.jar"
+  }
+}
+node "Device B" <<device>> as B {
+  database "DBMS" <<executionEnvironment>> {
+    artifact "schema"
+  }
+}
+note right of A : {instances = 2}
+A -- B : <protocol>
+@enduml

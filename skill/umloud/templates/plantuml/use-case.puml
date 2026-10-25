@@ -1,0 +1,17 @@
+@startuml
+' umLoud template — use case diagram (pair with use-case text!)
+title <System> — use cases
+left to right direction
+actor "Primary Actor" as P
+actor "External System" as S <<system>>
+rectangle "<System name>" {
+  usecase "Achieve Goal One" as UC1
+  usecase "Achieve Goal Two" as UC2
+  usecase "Shared Steps" as Inc
+}
+P -- UC1
+P -- UC2
+UC1 -- S
+UC1 ..> Inc : <<include>>
+UC2 ..> Inc : <<include>>
+@enduml
