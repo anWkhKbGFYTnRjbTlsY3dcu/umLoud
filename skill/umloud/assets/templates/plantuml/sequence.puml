@@ -1,0 +1,25 @@
+@startuml
+' umLoud template — sequence diagram (one scenario)
+title sd <Scenario name>
+hide footbox
+autoactivate on
+participant "a : ClassA" as A
+participant "b : ClassB" as B
+participant "c : ClassC" as C
+
+[-> A : start(args)
+A -> B : request(x)
+loop for each item
+  B -> C : process(item)
+  return result
+end
+alt condition
+  return ok
+else else
+  return error
+end
+opt optional step
+  A ->> C : notify()
+end
+[<-- A : result
+@enduml

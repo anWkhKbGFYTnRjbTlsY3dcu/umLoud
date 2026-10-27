@@ -1,0 +1,146 @@
+{
+  "skill_name": "umloud",
+  "evals": [
+    {
+      "id": "umloud-explicit-001",
+      "prompt": "Use umloud. Draw a UML sequence diagram in PlantUML for a user logging in: the browser sends the credentials to the API, the API asks the database for the user record, and if the password matches the API returns a token, otherwise it returns a 401 error.",
+      "expected_output": "A single-scenario PlantUML sequence diagram with browser, API and database lifelines, using a UML 2 alt frame for the password-match branch, plus a short list of assumptions.",
+      "assertions": [
+        "Read the umloud SKILL.md before drawing",
+        "Did not ask which format to use, because the user already said PlantUML",
+        "Produced PlantUML source between @startuml and @enduml with three participants",
+        "Showed the success and failure outcomes inside an alt/else frame, not as two separate diagrams",
+        "Used a return message to the browser in both branches (token and 401)",
+        "Gave the diagram source as copyable text in the chat reply",
+        "Did not create or save any file on disk, not even a temporary one",
+        "Did not run validate.py, because the user never agreed to a render check",
+        "Ended by offering to render-check the diagram and waited for the user's answer instead of running it"
+      ],
+      "expected_skill": "umloud",
+      "expected_script": null,
+      "files": []
+    },
+    {
+      "id": "umloud-implicit-001",
+      "prompt": "I need a UML diagram that shows how an order moves from placed to delivered in a generic online shop. There is no existing code, just model the process.",
+      "expected_output": "The agent asks which format the user wants (PlantUML, Mermaid or both) before drawing anything, and does not produce a diagram yet.",
+      "assertions": [
+        "Read the umloud SKILL.md before responding",
+        "Asked the user which format they want (PlantUML, Mermaid or both) before drawing",
+        "Did not output any diagram source in this reply",
+        "Did not say it would default to a format on its own",
+        "Did not create or save any file on disk",
+        "Did not run validate.py"
+      ],
+      "expected_skill": "umloud",
+      "expected_script": null,
+      "files": []
+    },
+    {
+      "id": "umloud-confluence-001",
+      "prompt": "Make a UML state machine diagram in Mermaid for a support ticket. It starts as New, becomes Open when an agent is assigned, goes to Resolved when fixed, and can be Reopened from Resolved if the customer replies. Resolved becomes Closed after 7 days. The Mermaid is for a Confluence page.",
+      "expected_output": "A Confluence-compatible Mermaid state diagram of one ticket, delivered as a single raw block with no code fence, introduced by the line 'Paste into your Confluence Mermaid macro.'",
+      "assertions": [
+        "Read the umloud SKILL.md before drawing",
+        "Did not ask whether the Mermaid is for Confluence, because the user already said so",
+        "Delivered the Mermaid as raw text without a code fence around it",
+        "Included the sentence 'Paste into your Confluence Mermaid macro.' before the block",
+        "Used a stateDiagram with a start state and transitions labelled event [guard] / activity where relevant",
+        "Did not use newer Mermaid features such as notes, titles or namespaces",
+        "Gave the diagram source as copyable text in the chat reply",
+        "Did not create or save any file on disk, not even a temporary one",
+        "Did not run validate.py, because the user never agreed to a render check",
+        "Ended by offering to render-check the diagram and waited for the user's answer instead of running it"
+      ],
+      "expected_skill": "umloud",
+      "expected_script": null,
+      "files": []
+    },
+    {
+      "id": "umloud-usecase-001",
+      "prompt": "Create a UML use case diagram for an online library in both PlantUML and Mermaid (modern Mermaid for GitHub, not Confluence). Actors are Member and Librarian. Members search the catalogue and borrow books. Borrowing always includes checking the member's account status. Reserving a book is an optional extension of searching the catalogue. Librarians manage the catalogue.",
+      "expected_output": "A use case diagram in both PlantUML and Mermaid with correct include and extend directions, plus the use case text.",
+      "assertions": [
+        "Read the umloud SKILL.md before drawing",
+        "Delivered both a PlantUML version and a Mermaid version",
+        "Drew <<include>> from Borrow Book to Check Account Status (toward the included use case)",
+        "Drew <<extend>> from Reserve Book to Search Catalogue (toward the base use case)",
+        "Showed a system boundary and the two actors Member and Librarian",
+        "Added the written use case text for the main use case",
+        "Gave the diagram source as copyable text in the chat reply",
+        "Did not create or save any file on disk, not even a temporary one",
+        "Did not run validate.py, because the user never agreed to a render check",
+        "Ended by offering to render-check the diagram and waited for the user's answer instead of running it"
+      ],
+      "expected_skill": "umloud",
+      "expected_script": null,
+      "files": []
+    },
+    {
+      "id": "umloud-review-001",
+      "prompt": "Review this UML class diagram and fix it. The format is PlantUML.\n\n@startuml\nclass Vehicle\nclass Car\nclass Wheel\nVehicle --|> Car\nCar o-- Wheel\n@enduml",
+      "expected_output": "A review that finds the reversed generalization (Car should point to Vehicle) and the aggregation diamond (use composition or a plain association), lists problems most serious first with the rule broken, and gives a corrected PlantUML diagram.",
+      "assertions": [
+        "Read the umloud SKILL.md before drawing",
+        "Identified that the generalization arrow is reversed and should point from Car to Vehicle",
+        "Identified the aggregation diamond as something UML 2 advises against and replaced it with composition or an association",
+        "Listed the problems with the most serious first and named the rule each one breaks",
+        "Gave a corrected diagram in PlantUML",
+        "Gave the diagram source as copyable text in the chat reply",
+        "Did not create or save any file on disk, not even a temporary one",
+        "Did not run validate.py, because the user never agreed to a render check",
+        "Ended by offering to render-check the diagram and waited for the user's answer instead of running it"
+      ],
+      "expected_skill": "umloud",
+      "expected_script": null,
+      "files": []
+    },
+    {
+      "id": "umloud-contextual-001",
+      "prompt": "Using the code in /workspace/input/shop/models.py, make a UML class diagram in Mermaid. It is for a GitHub README, not Confluence.",
+      "expected_output": "A Mermaid class diagram built only from the classes in models.py: Product, Customer, PremiumCustomer, OrderLine and Order, with PremiumCustomer generalizing to Customer.",
+      "assertions": [
+        "Read the umloud SKILL.md before drawing",
+        "Read /workspace/input/shop/models.py before drawing",
+        "Showed PremiumCustomer inheriting from Customer, with the arrow pointing at Customer",
+        "Included only the five classes found in the code and did not invent extra classes",
+        "Did not use an aggregation (hollow diamond) relationship anywhere",
+        "Gave the diagram source as copyable text in the chat reply",
+        "Did not create or save any file on disk, not even a temporary one",
+        "Did not run validate.py, because the user never agreed to a render check",
+        "Ended by offering to render-check the diagram and waited for the user's answer instead of running it"
+      ],
+      "expected_skill": "umloud",
+      "expected_script": null,
+      "files": [
+        "files/shop/models.py"
+      ]
+    },
+    {
+      "id": "umloud-negative-001",
+      "prompt": "Design a simple logo for my coffee shop called Bean There.",
+      "expected_output": "A logo concept produced without using the umloud skill and without any PlantUML or Mermaid output.",
+      "assertions": [
+        "Did not read umloud/SKILL.md",
+        "Did not produce PlantUML or Mermaid source",
+        "Responded to the logo request directly"
+      ],
+      "expected_skill": null,
+      "expected_script": null,
+      "files": []
+    },
+    {
+      "id": "umloud-negative-002",
+      "prompt": "Make a bar chart as a PNG of these monthly sales: Jan 120, Feb 95, Mar 140.",
+      "expected_output": "A bar chart of the three values produced without using the umloud skill, since a chart is not a UML diagram.",
+      "assertions": [
+        "Did not read umloud/SKILL.md",
+        "Did not produce a UML diagram or PlantUML or Mermaid class/sequence source",
+        "Produced or described a bar chart of the three monthly values"
+      ],
+      "expected_skill": null,
+      "expected_script": null,
+      "files": []
+    }
+  ]
+}

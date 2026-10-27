@@ -1,0 +1,17 @@
+@startuml
+' umLoud template — state machine for ONE class
+title <ClassName> — lifecycle
+hide empty description
+[*] --> Composite
+state Composite {
+  [*] --> StateA
+  state StateB : entry / onEnter
+  state StateB : do / ongoingWork
+  state StateB : exit / onExit
+  StateA --> StateB : event [guard] / activity
+  StateB --> StateA : otherEvent
+}
+Composite --> Done : cancel / cleanup
+StateB --> Done : finished
+Done --> [*]
+@enduml

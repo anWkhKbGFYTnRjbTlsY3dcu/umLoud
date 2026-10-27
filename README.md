@@ -84,6 +84,7 @@ umLoud/
 ├── LICENSE                   MIT
 ├── umloud-skill.zip          packaged skill/umloud/ for upload (rebuild after edits)
 ├── docs/                     header image for this README
+├── .gitignore                zip, __pycache__, evals/results
 └── skill/umloud/
     ├── SKILL.md              workflow: ask format (+ Confluence?) → pick diagram → load only needed files → draw → deliver → ask to validate (opt-in)
     ├── references/           RULES (format-neutral)
@@ -92,37 +93,40 @@ umLoud/
     │   ├── <type>.md                  class, object, package, sequence, communication, use-case,
     │   │                              state-machine, activity, component, deployment, other-diagrams
     │   ├── review-checklist.md        final QA
-    │   ├── mda.md                     MDA & Executable UML (only when asked)
-    │   └── uml-versions.md            changes since the book, UML 1→2 (only when needed)
-    ├── syntax/               SYNTAX + tested examples, one folder per format
-    │   ├── plantuml/  _common.md + <type>.md
-    │   └── mermaid/   _common.md (capabilities, Confluence profile) + _modern.md (non-Confluence extras) + <type>.md
-    ├── templates/            starter skeletons: plantuml/*.puml, mermaid/*.mmd
-    └── scripts/validate.py   renders every .puml/.mmd/Markdown block; reports failures; --confluence warns on unsafe Mermaid
+    │   ├── mda-executable-uml.md      MDA & Executable UML (only when asked)
+    │   ├── uml-versions.md            changes since the book, UML 1→2 (only when needed)
+    │   └── syntax/            SYNTAX + tested examples, one folder per format
+    │       ├── plantuml/  _common.md + <type>.md
+    │       └── mermaid/   _common.md (capabilities, Confluence profile) + _modern.md (non-Confluence extras) + <type>.md
+    ├── evals/                evals.json (8 cases: explicit, implicit, Confluence, review, negatives) + files/shop/models.py fixture
+    ├── assets/
+    │   └── templates/        starter skeletons: plantuml/*.puml, mermaid/*.mmd
+    └── scripts/validate.py   optional render check (only with user consent); output goes to a temp dir; --confluence warns on unsafe Mermaid
 ```
 
 ### Token budget
 Rules and syntax are split so a request loads only the diagram type and format it needs
-(class diagram, one format: ~4.6k tokens vs ~9k before the split). Don't merge them back.
+(class diagram, one format, incl. SKILL.md and review checklist: ~8k tokens). Don't merge them back.
 
 ### Validate
-```bash
-export PLANTUML_JAR=/path/plantuml.jar   # + java, Graphviz; Mermaid: npm i -g @mermaid-js/mermaid-cli
-python skill/umloud/scripts/validate.py skill/umloud --out ./uml-out
-```
-Mermaid rendering also needs a Chrome/Chromium binary for Puppeteer; `validate.py` auto-detects common paths
-(system installs, Playwright/Puppeteer caches) and `PUPPETEER_EXECUTABLE_PATH`/`MERMAID_CHROME`. If none is
-found it SKIPs Mermaid diagrams with an install hint instead of failing — a missing browser in a given
-environment is a one-time setup gap, not a diagram problem.
-All 55 examples/templates pass (PlantUML 1.2024.7, Mermaid CLI 11).
+Validation is **optional and permission-based**: after delivering a diagram the skill offers a render check and
+runs `scripts/validate.py` only if the user says yes. Nothing is saved to the user's folders — the diagram source
+is pasted in chat, and any render output goes to a temp directory (override with `--out`).
+
+Options: `<files>`, `--format png|svg`, `--out DIR`, `--plantuml-jar JAR`, `--chrome PATH`, `--confluence`.
+Exit codes: 0 all rendered, 1 a diagram failed, 2 a tool is missing. PlantUML needs Java and the jar;
+Mermaid needs Mermaid CLI (`mmdc`) plus a Chrome/Chromium binary for Puppeteer — point to it with `--chrome`
+if it isn't found. A missing tool is a setup gap, not a diagram problem.
+All 56 examples/templates pass (PlantUML 1.2024.7, Mermaid CLI 11).
 
 ### Maintaining
-- Rules → `references/`, syntax/examples → `syntax/<format>/`. Keep both formats' files for a type in sync.
+- Rules → `references/`, syntax/examples → `references/syntax/<format>/`. Keep both formats' files for a type in sync.
 - Re-run `validate.py` after edits; rebuild the zip; update the tree above and the changelog.
 - `umloud-skill.zip` is a build artifact — gitignore it rather than committing; attach it to a release instead
   if you want a versioned download.
 
 ### Changelog
+- **2026-10-27** — Folders reorganised (`references/syntax/`, `assets/templates/`); SKILL.md frontmatter (version, tags, allowed-tools) and sections added; 10 worked examples; validation made optional and consent-based with temp-only output; `validate.py` hardened (`shell=False`, timeouts, allow-listed formats); `evals/` added; PlantUML sequence `autoactivate` + alt/else example fixed; 56 diagrams re-verified.
 - **2026-10-25** — Initial version: SKILL.md, references, templates, validate.py; all examples render-tested.
 
 ## Contributing
@@ -131,13 +135,12 @@ Issues and PRs welcome — see [`CONTRIBUTORS.md`](CONTRIBUTORS.md) for who's al
 
 - **Bug / incorrect notation?** Open an issue with the request you gave it and what came back.
 - **Adding or editing a diagram type or syntax rule?** Rules live in `skill/umloud/references/` (format-neutral),
-  syntax + examples in `skill/umloud/syntax/<format>/`. Keep PlantUML and Mermaid in sync for the same type.
+  syntax + examples in `skill/umloud/references/syntax/<format>/`. Keep PlantUML and Mermaid in sync for the same type.
 - **Before opening a PR:**
-  1. Re-run the validator: `python skill/umloud/scripts/validate.py skill/umloud --out ./uml-out` (and `--confluence`
-     if you touched Mermaid) — every example must still render.
+  1. Make sure every example still renders.
   2. Rebuild `umloud-skill.zip` from `skill/umloud/`.
   3. Update the structure tree and changelog in this README.
-- Keep `SKILL.md` lean — it's loaded on every run. Put detail in `references/`/`syntax/` and load it on demand.
+- Keep `SKILL.md` lean — it's loaded on every run. Put detail in `references/` (including `references/syntax/`) and load it on demand.
 
 ## License
 

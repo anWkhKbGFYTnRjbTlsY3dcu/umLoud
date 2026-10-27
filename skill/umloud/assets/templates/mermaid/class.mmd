@@ -1,0 +1,26 @@
+classDiagram
+  %% umLoud template — class diagram
+  class Supertype {
+    <<abstract>>
+    +name : String [1]
+    +operation()* Result
+  }
+  class Subtype {
+    +attribute : Type [0..1]
+    +command(param : Type)
+  }
+  class Contract {
+    <<interface>>
+    +call()
+  }
+  class Kind {
+    <<enumeration>>
+    A
+    B
+  }
+  Supertype <|-- Subtype
+  Whole "1" *-- "*" Part : parts ordered
+  Subtype "*" --> "1" Other : other
+  Contract <|.. Other
+  Subtype ..> Kind
+  %% Constraint: write constraints in the page text next to the diagram

@@ -1,0 +1,5 @@
+__pycache__/
+*.pyc
+umloud-skill.zip
+skill/umloud/evals/results/
+skill/umloud-reports/

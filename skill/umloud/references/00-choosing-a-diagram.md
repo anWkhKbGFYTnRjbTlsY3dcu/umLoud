@@ -35,7 +35,7 @@ Ask (or infer) two things; they change how much detail is correct:
 1. **Mode**
    - *Sketch* (default): selective, communicates the important parts only. Leave out anything that does not serve the point.
    - *Blueprint*: complete for the area it covers; every element a programmer needs is present and precise.
-   - *Programming language*: the model **is** the source — tools turn it into running code (see the box below). Rare; only on request — then read `mda.md`.
+   - *Programming language*: the model **is** the source — tools turn it into running code (see the box below). Rare; only on request — then read `mda-executable-uml.md`.
 2. **Perspective**
    - *Conceptual*: vocabulary of a business domain. No navigability arrows, no visibility, no implementation types, operations only as responsibilities.
    - *Software*: elements map to code; types, navigability, visibility and operations are meaningful.

@@ -3,25 +3,27 @@
 
 Usage:
     python validate.py PATH [PATH ...] [--out DIR] [--format svg|png]
+                       [--plantuml-jar JAR] [--chrome PATH] [--confluence]
+
+Without --out, images go to a fresh system temp directory (not your project folder).
 
 PATH can be a .puml / .plantuml / .mmd / .mermaid file, a Markdown file
 (every ```plantuml and ```mermaid fenced block is checked), or a directory
 (searched recursively for all of the above).
 
 Renderers:
-  PlantUML: `plantuml` on PATH, or set PLANTUML_JAR=/path/to/plantuml.jar (needs java;
+  PlantUML: `plantuml` on PATH, or pass --plantuml-jar /path/to/plantuml.jar (needs java;
             Graphviz `dot` is needed for class/component/use-case/deployment layouts).
   Mermaid:  `mmdc` on PATH (npm i -g @mermaid-js/mermaid-cli). If it can't find a browser,
-            set PUPPETEER_EXECUTABLE_PATH to a Chrome/Chromium binary.
+            pass --chrome /path/to/chrome-or-chromium.
 
 With --confluence, Mermaid sources are also checked for constructs older Confluence Mermaid apps reject (WARN lines).
 
 Exit code 0 = everything rendered; 1 = at least one diagram failed; 2 = no renderer found.
-Rendered images are written to --out (default ./uml-out) so they can be inspected.
+Rendered images are written to --out, or to a new temp directory if --out is omitted; the path is printed on the last line.
 """
 import argparse
 import json
-import os
 import re
 import shutil
 import subprocess
@@ -29,13 +31,17 @@ import sys
 import tempfile
 from pathlib import Path
 
+# Named limits (no magic numbers).
+RENDER_TIMEOUT_SECONDS = 180
+MAX_NAME_LENGTH = 120
+ALLOWED_FORMATS = ("svg", "png")
+
 PUML_EXT = {".puml", ".plantuml", ".pu", ".iuml"}
 MMD_EXT = {".mmd", ".mermaid"}
 FENCE = re.compile(r"^```(plantuml|puml|mermaid)\s*\n(.*?)^```", re.M | re.S)
 
 
-def plantuml_cmd():
-    jar = os.environ.get("PLANTUML_JAR")
+def plantuml_cmd(jar=None):
     if jar and Path(jar).is_file() and shutil.which("java"):
         return ["java", "-Djava.awt.headless=true", "-jar", jar]
     if shutil.which("plantuml"):
@@ -68,7 +74,7 @@ def collect(paths):
 
 
 def safe_name(label):
-    return re.sub(r"[^A-Za-z0-9_.-]+", "_", label).strip("_")[-120:]
+    return re.sub(r"[^A-Za-z0-9_.-]+", "_", label).strip("_")[-MAX_NAME_LENGTH:]
 
 
 CONFLUENCE_UNSAFE = [
@@ -101,11 +107,14 @@ def clean(err):
 
 
 def render_plantuml(cmd, src, out_dir, name, fmt):
+    if fmt not in ALLOWED_FORMATS:
+        return False, f"unsupported format: {fmt}"
     with tempfile.TemporaryDirectory() as tmp:
         f = Path(tmp) / f"{name}.puml"
         f.write_text(src, encoding="utf-8")
+        # Argument list, no shell; fmt is allow-listed above, paths are our own temp files.
         r = subprocess.run(cmd + [f"-t{fmt}", "-failfast2", "-o", str(out_dir.resolve()), str(f)],
-                           capture_output=True, text=True, timeout=180)
+                           capture_output=True, text=True, timeout=RENDER_TIMEOUT_SECONDS, shell=False)
         err = clean(r.stdout + r.stderr).strip()
         produced = (out_dir / f"{name}.{fmt}").exists()
         ok = r.returncode == 0 and produced
@@ -116,7 +125,9 @@ def render_plantuml(cmd, src, out_dir, name, fmt):
         return ok, err
 
 
-def render_mermaid(cmd, src, out_dir, name, fmt):
+def render_mermaid(cmd, src, out_dir, name, fmt, chrome=None):
+    if fmt not in ALLOWED_FORMATS:
+        return False, f"unsupported format: {fmt}"
     with tempfile.TemporaryDirectory() as tmp:
         f = Path(tmp) / f"{name}.mmd"
         f.write_text(src, encoding="utf-8")
@@ -124,12 +135,12 @@ def render_mermaid(cmd, src, out_dir, name, fmt):
         args = cmd + ["-q", "-i", str(f), "-o", str(out)]
         cfg = Path(tmp) / "puppeteer.json"
         conf = {"args": ["--no-sandbox", "--disable-setuid-sandbox"]}
-        chrome = os.environ.get("PUPPETEER_EXECUTABLE_PATH") or os.environ.get("MERMAID_CHROME")
-        if chrome:
+        if chrome and Path(chrome).is_file():
             conf["executablePath"] = chrome
         cfg.write_text(json.dumps(conf))
         args += ["-p", str(cfg)]
-        r = subprocess.run(args, capture_output=True, text=True, timeout=180)
+        # Argument list, no shell; fmt is allow-listed above, paths are our own temp files.
+        r = subprocess.run(args, capture_output=True, text=True, timeout=RENDER_TIMEOUT_SECONDS, shell=False)
         err = (r.stdout + r.stderr).strip()
         return r.returncode == 0 and out.exists(), err
 
@@ -137,15 +148,21 @@ def render_mermaid(cmd, src, out_dir, name, fmt):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("paths", nargs="+")
-    ap.add_argument("--out", default="uml-out")
-    ap.add_argument("--format", default="svg", choices=["svg", "png"])
+    ap.add_argument("--out", default=None,
+                    help="output dir (default: a new system temp dir, so nothing is written to the project)")
+    ap.add_argument("--format", default="svg", choices=list(ALLOWED_FORMATS))
+    ap.add_argument("--plantuml-jar", default=None, help="path to plantuml.jar (needs java)")
+    ap.add_argument("--chrome", default=None, help="path to a Chrome/Chromium binary for Mermaid")
     ap.add_argument("--confluence", action="store_true",
                     help="warn about Mermaid constructs older Confluence Mermaid apps reject")
     a = ap.parse_args()
 
-    out_dir = Path(a.out)
-    out_dir.mkdir(parents=True, exist_ok=True)
-    pu, mm = plantuml_cmd(), mermaid_cmd()
+    if a.out:
+        out_dir = Path(a.out)
+        out_dir.mkdir(parents=True, exist_ok=True)
+    else:
+        out_dir = Path(tempfile.mkdtemp(prefix="umloud-"))
+    pu, mm = plantuml_cmd(a.plantuml_jar), mermaid_cmd()
     items = list(collect(a.paths))
     if not items:
         print("No diagrams found.")
@@ -160,7 +177,8 @@ def main():
             print(f"SKIP  [{kind}] {label}  (renderer not installed)")
             continue
         fn = render_plantuml if kind == "plantuml" else render_mermaid
-        ok, err = fn(cmd, src, out_dir, name, a.format)
+        extra = {"chrome": a.chrome} if kind == "mermaid" else {}
+        ok, err = fn(cmd, src, out_dir, name, a.format, **extra)
         if ok:
             print(f"OK    [{kind}] {label}")
             if kind == "mermaid" and a.confluence:

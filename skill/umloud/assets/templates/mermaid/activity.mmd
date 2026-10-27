@@ -1,0 +1,24 @@
+flowchart TB
+  %% umLoud template — activity (Mermaid approximation of UML)
+  start((" ")):::initial
+  a1(First Action)
+  f1[" "]:::bar
+  p1(Parallel Action 1)
+  p2(Parallel Action 2)
+  j1[" "]:::bar
+  d1{"condition?"}
+  y(Action If Yes)
+  n(Action Otherwise)
+  m1{ }
+  last(Final Action)
+  fin((("●"))):::final
+  start --> a1 --> f1
+  f1 --> p1 --> j1
+  f1 --> p2 --> j1
+  j1 --> d1
+  d1 -- "[yes]" --> y --> m1
+  d1 -- "[else]" --> n --> m1
+  m1 --> last --> fin
+  classDef initial fill:#000,stroke:#000,color:#000
+  classDef final fill:#fff,stroke:#000,stroke-width:2px,color:#000
+  classDef bar fill:#000,stroke:#000,color:#000,font-size:2px
